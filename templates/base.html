@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <title>Book Board</title>
+    </head>
+    <body>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            {#
+                nav: 現在の文書内の他の分野他の文書へのナビゲーションリンクを提供するためのセクションを表す
+                class属性: HTMLの要素(タグ)の中で設定することができる属性(attribute)の
+                一つで、複数の要素を一つのグループにまとめ、共通の識別子(クラス名)を与えるもの
+            #}
+            <a class="navbar-brand" href="{{ url_for('main')}}">Main</a>
+            <a class="navbar-brand" href="{{ url_for('load_new_title')}}">新刊一覧</a>
+            <a class="navbar-brand" href="{{ url_for('terms_of_service')}}">利用規約</a>
+        </nav>
+        <div class="jumbotron"> {#class jumbotronでグループ化#}
+            <h1 align="center">Book Boardホームページ</h1>
+        </div>
+        <div class="container">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </body>
+</html>

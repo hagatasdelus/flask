@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>今月の新刊</h2>
+    {% if not book_list %}
+        <p>今月の新刊はありません</p>
+    {% else %}
+        <table border="1" width="300">
+            <tr>
+                <th>タイトル</th>
+                <th>金額</th>
+            </tr>
+            {% for book in book_list %}
+                <tr align="center">              
+                    <td>
+                        <a href="{{ url_for('book_detail', book_number=book.number) }}">
+                            {{ book.title }}
+                        </a>   
+                    </td>
+                    <td>{{ book.price }}円</td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+{% endblock %}
