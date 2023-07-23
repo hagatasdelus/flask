@@ -1,4 +1,3 @@
-"""__init__.pyはappの作成, DB等の各種設定を行っています。"""
 import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
