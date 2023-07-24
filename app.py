@@ -1,15 +1,7 @@
 from flask import Flask, render_template, redirect, url_for
+from flaskr.models import BookInfo
 
 app = Flask(__name__)
-
-class BookInfo:
-    def __init__(self, number, title, genre, price, arrival_day, picture_path):
-        self.number = number
-        self.title = title
-        self.genre = genre
-        self.price = price
-        self.arrival_day = arrival_day
-        self.picture_path = picture_path
 
 book_list = [
         BookInfo(0, 'はらぺこあおむし', '絵本', 2000, '2023/2/14', 'image/harapekoaomushi.jpg'),
