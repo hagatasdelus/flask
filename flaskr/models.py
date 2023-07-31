@@ -23,3 +23,8 @@ class BookInfo:
         self.price = price
         self.arrival_day = arrival_day
         self.picture_path = picture_path
+
+class User(UserMixin, db.Model):
+
+    __tablename__ = 'users'
+
