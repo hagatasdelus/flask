@@ -31,7 +31,7 @@ class User(UserMixin, db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), index=True, default=lambda: str(randint(10**7, 10**8-1)))
-    email = db.Column(db.String(64), unique=True, index=True, nullable=True)
+    email = db.Column(db.String(64), unique=True, index=True)
     password = db.Column(db.String(128), default = generate_password_hash('libraryapp'))
     is_active = db.Column(db.Boolean, unique=False, default=False)
     create_at = db.Column(db.DateTime, default=datetime.now)
@@ -39,3 +39,9 @@ class User(UserMixin, db.Model):
 
     def __init__(self, email):
         self.email = email
+
+    def validate_password(self, password):
+        return check_password_hash(self.password, password)
+    
+    def create_new_user(self):
+        db.session.add(self)
