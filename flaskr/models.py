@@ -5,6 +5,7 @@ from sqlalchemy.orm import aliased #参照先の複数テーブルを紐づけ�
 from sqlalchemy import and_, or_, desc
 from datetime import datetime, timedelta
 from contextlib import contextmanager
+from random import randint
 
 @contextmanager
 def transaction():
@@ -28,3 +29,13 @@ class User(UserMixin, db.Model):
 
     __tablename__ = 'users'
 
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(64), index=True, default=lambda: str(randint(10**7, 10**8-1)))
+    email = db.Column(db.String(64), unique=True, index=True, nullable=True)
+    password = db.Column(db.String(128), default = generate_password_hash('libraryapp'))
+    is_active = db.Column(db.Boolean, unique=False, default=False)
+    create_at = db.Column(db.DateTime, default=datetime.now)
+    update_at = db.Column(db.DateTime, default=datetime.now)
+
+    def __init__(self, email):
+        self.email = email
