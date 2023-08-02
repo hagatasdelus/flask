@@ -45,3 +45,11 @@ class User(UserMixin, db.Model):
     
     def create_new_user(self):
         db.session.add(self)
+
+    @classmethod
+    def select_user_by_email(cls, email):
+        return cls.query.filter_by(email=email).first()
+    @classmethod
+    def select_user_by_id(cls, id):
+        return cls.query.get(id)
+    
