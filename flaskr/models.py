@@ -1,9 +1,9 @@
 from flaskr import db, login_manager
 from flask_bcrypt import generate_password_hash, check_password_hash
 from flask_login import UserMixin, current_user
-from sqlalchemy.orm import aliased #参照先の複数テーブルを紐づけたい時に使う
-from sqlalchemy import and_, or_, desc
-from datetime import datetime, timedelta
+# from sqlalchemy.orm import aliased
+# from sqlalchemy import and_, or_, desc
+# from datetime import datetime, timedelta
 from contextlib import contextmanager
 from random import randint
 
