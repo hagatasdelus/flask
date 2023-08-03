@@ -36,6 +36,16 @@ def login():
             flash('Incorrect email address/password combination.')
     return render_template('', form=form)
 
+@bp.route('/user_info', methods=['GET', 'POST'])
+@login_required
+def user_info():
+    form = UserForm(request.form)
+    if request.method == 'POST' and form.validate():
+        user_id = current_user.get_id()
+        user = User.select_user_by_id(user_id)
+        with transaction():
+            user.username = form.username.data
+    return render_template('user_info.html', form=form)
 
 
     
