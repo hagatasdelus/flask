@@ -12,9 +12,9 @@
                 class属性: HTMLの要素(タグ)の中で設定することができる属性(attribute)の
                 一つで、複数の要素を一つのグループにまとめ、共通の識別子(クラス名)を与えるもの
             #}
-            <a class="navbar-brand" href="{{ url_for('main')}}">Main</a>
-            <a class="navbar-brand" href="{{ url_for('load_new_title')}}">新刊一覧</a>
-            <a class="navbar-brand" href="{{ url_for('terms_of_service')}}">利用規約</a>
+            <a class="navbar-brand" href="{{ url_for('app.main')}}">Main</a>
+            <a class="navbar-brand" href="{{ url_for('app.load_new_title')}}">新刊一覧</a>
+            <a class="navbar-brand" href="{{ url_for('app.terms_of_service')}}">利用規約</a>
         </nav>
         <div class="jumbotron"> {#class jumbotronでグループ化#}
             <h1 align="center">Book Boardホームページ</h1>

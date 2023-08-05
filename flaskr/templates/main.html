@@ -1,7 +1,20 @@
 {% extends "base.html" %}
+{% block title %}
+ホーム - {{ super() }}
+{% endblock %}
 {% block content %}
 <h1>Book Board</h1>
 <h2>ようこそ。Book Boardへ</h2>
 <a>メインページです</a>
+<div class="row">
+    {% if current_user.is_authenticated %}
+    <div class="col-lg-4 offset-lg-2">
+        <p>ユーザー番号: {{ current_user.username }}</p>
+        <p>メールアドレス: {{  current_user.email }}</p>
+    </div>
+    {% else %}
+        <p>ログイン or 登録してください</p>
+    {% endif %}
+</div>
 {% endblock %}
         

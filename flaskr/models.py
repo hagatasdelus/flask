@@ -3,7 +3,7 @@ from flask_bcrypt import generate_password_hash, check_password_hash
 from flask_login import UserMixin, current_user
 # from sqlalchemy.orm import aliased
 # from sqlalchemy import and_, or_, desc
-# from datetime import datetime, timedelta
+from datetime import datetime#, timedelta
 from contextlib import contextmanager
 from random import randint
 
@@ -24,6 +24,10 @@ class BookInfo:
         self.price = price
         self.arrival_day = arrival_day
         self.picture_path = picture_path
+
+@login_manager.user_loader #htmlのcurrent_user.is_authenticatedでユーザ情報を取りに来る。ユーザが既に認証されたのかを確認できる
+def load_user(user_id):
+    return User.query.get(user_id)
 
 class User(UserMixin, db.Model):
 
