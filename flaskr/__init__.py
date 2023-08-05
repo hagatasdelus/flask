@@ -19,9 +19,9 @@ def create_app():
     app.config['SECRET_KEY'] = 'mysite'
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(base_dir, 'data.sqlite')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
-    # from flaskr.views import bp
-    # app.register_blueprint(bp)
-    # app.add_template_filter(replace_newline) #メッセージ改行のための。utilsから
+    from flaskr.views import bp
+    app.register_blueprint(bp)
+    app.add_template_filter(replace_newline) #メッセージ改行のための。utilsから
     db.init_app(app)
     migrate.init_app(app, db)
     login_manager.init_app(app)
