@@ -16,19 +16,43 @@ def transaction():
         db.session.rollback()
         raise
 
-class BookInfo:
-    def __init__(self, number, title, genre, price, arrival_day, picture_path):
-        self.number = number
-        self.title = title
-        self.genre = genre
-        self.price = price
-        self.arrival_day = arrival_day
-        self.picture_path = picture_path
-
 @login_manager.user_loader #htmlのcurrent_user.is_authenticatedでユーザ情報を取りに来る。ユーザが既に認証されたのかを確認できる
 def load_user(user_id):
     return User.query.get(user_id)
 
+class BookInfo(db.Model):
+
+    __tablename__ = 'book_infos'
+    
+    number = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(64), index=True, nullable=False)
+    genre = db.Column(db.String(64), index=True, unique=False, index=True, default="割当無し")
+    price = db.Column(db.Integer, nullable=False)
+    arrival_day = db.Column(db.DateTime, default=datetime.now)
+    picture_path = db.Column(db.String(64), default='static/image/no_image.jpg')
+
+
+    def __init__(self, number, title, price, arrival_day):
+        self.number = number
+        self.title = title
+        self.price = price
+        self.arrival_day = arrival_day
+
+    def create_new_book(self):
+        db.session.add(self)
+    
+    @classmethod
+    def select_book_by_title(cls, title, page=1):
+        return cls.query.filter(
+            cls.title.like(f'%{title}%')
+        ).order_by(cls.title).paginate(page=page, per_page=50, error_out=False)
+    @classmethod
+    def select_book_by_genre(cls, genre, page=1):
+        return cls.query.filter(
+            cls.genre.like(f'%{genre}%')
+        ).order_by(cls.genre).paginate(page=page, per_page=50, error_out=False)
+       
+      
 class User(UserMixin, db.Model):
 
     __tablename__ = 'users'
