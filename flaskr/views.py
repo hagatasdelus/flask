@@ -7,7 +7,7 @@ from flaskr.forms import (
     LoginForm, RegisterForm, PasswordResetForm, UserForm
 )
 from flaskr.models import (
-    BookInfo, User, transaction
+    BookInfo, User, transaction, PasswordResetToken
 )
 
 bp = Blueprint('app', __name__, url_prefix='')
@@ -29,16 +29,21 @@ def home():
 def load_new_title():
     return render_template('newtitle.html', book_list=book_list)
 
-@bp.route('/book/<int:book_number>') #メンバー詳細ページ
+@bp.route('/book/<int:book_number>')
 def book_detail(book_number):
     for book in book_list:
         if book.number == book_number:
             return render_template('book_detail.html', book=book)
-    return redirect(url_for('home')) #いなかったらmainにリダイレクトする
+    return redirect(url_for('home'))
 
-@bp.route('/terms') #利用規約
+@bp.route('/terms')
 def terms_of_service():
     return render_template('terms.html')
+
+@bp.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('app.home'))
 
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
@@ -58,6 +63,28 @@ def login():
         elif not user.validate_password(form.password.data):
             flash('Incorrect email address/password combination.')
     return render_template('login.html', form=form)
+
+@bp.route('/register', methods=['GET', 'POST'])
+def register():
+    form = RegisterForm(request.form)
+    if request.method == 'POST' and form.validate():
+        user = User(email = form.email.data)
+        from setup import app
+        with app.app_context():
+            with transaction():
+                user.create_new_user()
+            token = ''
+            with transaction():
+                token = PasswordResetToken.publish_token(user)  #* 有効期限1日のランダムな文字列でできたtoken, そのuserのid, tokenの有効期限をDBに追加してtokenを返す
+            #メールに飛ばす方が良い(メールが合っているかの確認ができるから)
+            print(f'パスワード設定用URL: http://127.0.0.1:5000/reset_password/{token}')
+            flash('パスワード設定用のURLをお送りしました。')
+        return redirect(url_for('app.login')) #login関数に遷移
+    return render_template('register.html', form=form) #GETの場合、register.htmlが表示される
+
+@bp.route('/forgot_password', methods=['GET', 'POST'])
+def forgot_password():
+    return render_template('')
 
 @bp.route('/user_info', methods=['GET', 'POST'])
 @login_required

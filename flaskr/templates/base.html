@@ -15,6 +15,12 @@
             <a class="navbar-brand" href="{{ url_for('app.home') }}">ホーム</a>
             <a class="navbar-brand" href="{{ url_for('app.load_new_title') }}">新刊一覧</a>
             <a class="navbar-brand" href="{{ url_for('app.terms_of_service') }}">利用規約</a>
+            {% if current_user.is_authenticated %}
+            <a class="navbar-brand" href="{{ url_for('app.logout') }}">ログアウト</a>
+            {% else %}
+            <a class="navbar-brand" href="{{ url_for('app.login') }}">ログイン</a>
+            <a class="navbar-brand" href="{{ url_for('app.register') }}">登録</a>
+            {% endif %} 
         </nav>
         <div class="jumbotron"> {#class jumbotronでグループ化#}
             <h1 align="center">Book Boardホームページ</h1>
