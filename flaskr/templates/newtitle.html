@@ -12,7 +12,7 @@
             {% for book in book_list %}
                 <tr align="center">              
                     <td>
-                        <a href="{{ url_for('book_detail', book_number=book.number) }}">
+                        <a href="{{ url_for('app.book_detail', book_number=book.number) }}">
                             {{ book.title }}
                         </a>   
                     </td>

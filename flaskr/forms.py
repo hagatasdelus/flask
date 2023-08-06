@@ -22,6 +22,20 @@ class RegisterForm(FlaskForm):
         if User.select_user_by_email(field.data):
             raise ValidationError('メールアドレスはすでに登録されています')
 
+class PasswordResetForm(FlaskForm):
+    password = PasswordField('パスワード: ',validators=[DataRequired(), EqualTo('confirm_password', message='パスワード不一致')])
+    confirm_password = PasswordField('パスワード確認: ', validators=[DataRequired()])
+    submit = SubmitField('パスワード更新')
+
+
+class ForgotPasswordForm(FlaskForm):
+    email = StringField('メール: ', validators=[DataRequired(), Email()])
+    submit = SubmitField('パスワードを再設定')
+
+    def validate_email(self, field):
+        if not User.select_user_by_email(field.data): #DBからそのEmailを取ってこれなかったら
+            raise ValidationError('そのメールアドレスは存在しません')
+        
 class UserForm(FlaskForm):
     email = StringField('メール: ', validators=[DataRequired(), Email('メールアドレスが誤っています')])
     username = StringField('利用者ID: ', validators=[DataRequired()])
@@ -36,9 +50,3 @@ class UserForm(FlaskForm):
                 #なんか処理
                 return False
         return True
-
-class PasswordResetForm(FlaskForm):
-    password = PasswordField('パスワード: ',validators=[DataRequired(), EqualTo('confirm_password', message='パスワード不一致')])
-    confirm_password = PasswordField('パスワード確認: ', validators=[DataRequired()])
-    submit = SubmitField('パスワード更新')
-

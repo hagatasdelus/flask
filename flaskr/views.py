@@ -21,7 +21,6 @@ book_list = [
 
 
 @bp.route('/')
-
 def main():
     # session['url'] = 'app.home'
     return render_template('main.html')
