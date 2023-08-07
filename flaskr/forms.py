@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms.fields import (
-    StringField, PasswordField, SubmitField, HiddenField
+    StringField, PasswordField, SubmitField, HiddenField, IntegerField, DateField, SelectField
 )
 from wtforms import ValidationError
 from wtforms.validators import DataRequired, Email, EqualTo
@@ -50,3 +50,9 @@ class UserForm(FlaskForm):
                 #なんか処理
                 return False
         return True
+
+class BookForm(FlaskForm):
+    title = StringField('')
+    price = IntegerField('')
+    genre = SelectField('ジャンル: ', choices=[('', ''), ('', ''), ('', '')])
+    arrival_day = DateField('到着日: ', validators=[DataRequired('Please enter data')], format='%Y-%m-%d', render_kw={"placeholder": "yyyy/mm/dd"})

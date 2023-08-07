@@ -25,7 +25,7 @@ class BookInfo(db.Model):
 
     __tablename__ = 'book_infos'
     
-    number = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(64), index=True, nullable=False)
     genre = db.Column(db.String(64), index=True, unique=False, default="割当無し")
     price = db.Column(db.Integer, nullable=False)
@@ -33,8 +33,7 @@ class BookInfo(db.Model):
     picture_path = db.Column(db.String(64), default='static/image/no_image.jpg')
 
 
-    def __init__(self, number, title, price, arrival_day):
-        self.number = number
+    def __init__(self, title, price, arrival_day):
         self.title = title
         self.price = price
         self.arrival_day = arrival_day
