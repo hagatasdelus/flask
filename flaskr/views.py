@@ -4,7 +4,7 @@ from flask import (
 )
 from flask_login import login_user, login_required, logout_user, current_user
 from flaskr.forms import (
-    LoginForm, RegisterForm, PasswordResetForm, UserForm
+    LoginForm, RegisterForm, PasswordResetForm, UserForm, ForgotPasswordForm
 )
 from flaskr.models import (
     BookInfo, User, transaction, PasswordResetToken
@@ -84,7 +84,10 @@ def register():
 
 @bp.route('/forgot_password', methods=['GET', 'POST'])
 def forgot_password():
-    return render_template('')
+    form = ForgotPasswordForm()
+    if request.method == 'POST' and form.validate():
+        email = form.email.data
+    return render_template('forgot_password.html', form=form)
 
 @bp.route('/user_info', methods=['GET', 'POST'])
 @login_required
