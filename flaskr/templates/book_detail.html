@@ -2,9 +2,9 @@
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
 <div class="row">
-    <div class="col-lg-8 offset-lg-2"></div> {#この辺はレイアウトの問題#}
+    <div class="col-lg-8 offset-lg-2"></div>
         <img src="{{ url_for('static', filename=book.picture_path) }}">
-        <ul> {#unordered list順序がない箇条書きのリストを表示する際に使用#}
+        <ul>
             <li>書籍名: {{book.title}}</li>
             <li>ジャンル: {{book.genre}}</li>
             <li>値段: {{book.price}}円</li>

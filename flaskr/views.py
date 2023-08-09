@@ -26,17 +26,17 @@ def home():
     return render_template('home.html')
 
 @bp.route('/newtitle')
-def load_new_title():
+def newtitle():
     book_list = None
-    book_list = BookInfo.select_book()
+    book_list = BookInfo.get_books()
     return render_template('newtitle.html', book_list=book_list)
 
-@bp.route('/book/<int:book_number>')
-def book_detail(book_number):
-    for book in book_list:
-        if book.number == book_number:
-            return render_template('book_detail.html', book=book)
-    return redirect(url_for('home'))
+@bp.route('/book/<int:id>')
+def book_detail(id):
+    book = BookInfo.get_book_by_id(id)
+    if book:
+        return render_template('book_detail.html', book=book)
+    return redirect(url_for('app.home'))
 
 @bp.route('/terms')
 def terms_of_service():

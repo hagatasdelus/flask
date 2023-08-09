@@ -5,7 +5,6 @@ from flask_login import UserMixin, current_user
 # from sqlalchemy import and_, or_, desc
 from datetime import datetime, timedelta
 from contextlib import contextmanager
-from random import randint
 from uuid import uuid4
 
 @contextmanager
@@ -57,14 +56,17 @@ class BookInfo(db.Model):
         return cls.query.order_by(
             cls.arrival_day.desc()
         ).limit(10).all()
-       
+    
+    @classmethod
+    def get_book_by_id(cls, id):
+        return cls.query.get(id)
       
 class User(UserMixin, db.Model):
 
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(64), index=True, default=lambda: str(randint(10**7, 10**8-1)))
+    username = db.Column(db.String(64), index=True)
     email = db.Column(db.String(64), unique=True, index=True)
     password = db.Column(db.String(128), default = generate_password_hash('libraryapp'))
     is_active = db.Column(db.Boolean, unique=False, default=False)
@@ -83,6 +85,7 @@ class User(UserMixin, db.Model):
     @classmethod
     def select_user_by_email(cls, email):
         return cls.query.filter_by(email=email).first()
+    
     @classmethod
     def select_user_by_id(cls, id):
         return cls.query.get(id)

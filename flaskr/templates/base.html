@@ -13,7 +13,7 @@
                 一つで、複数の要素を一つのグループにまとめ、共通の識別子(クラス名)を与えるもの
             #}
             <a class="navbar-brand" href="{{ url_for('app.home') }}">ホーム</a>
-            <a class="navbar-brand" href="{{ url_for('app.load_new_title') }}">新刊一覧</a>
+            <a class="navbar-brand" href="{{ url_for('app.newtitle') }}">新刊一覧</a>
             <a class="navbar-brand" href="{{ url_for('app.terms_of_service') }}">利用規約</a>
             {% if current_user.is_authenticated %}
             <a class="navbar-brand" href="{{ url_for('app.logout') }}">ログアウト</a>
