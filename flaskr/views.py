@@ -1,6 +1,6 @@
 from flask import (
     request, render_template, redirect, url_for, Blueprint,
-    session, flash
+    session, flash, abort
 )
 from flask_login import login_user, login_required, logout_user, current_user
 from flaskr.forms import (
@@ -82,11 +82,30 @@ def register():
         return redirect(url_for('app.login')) #login関数に遷移
     return render_template('register.html', form=form) #GETの場合、register.htmlが表示される
 
+@bp.route('/password_reset/<uuid:token>', methods=['GET', 'POST'])
+def reset_password(token):
+    form = PasswordResetForm(request.form)
+    from setup import app
+    with app.app_context():
+        reset_user_id = PasswordResetToken.get_user_id_by_token(token)
+        if not reset_user_id:
+            abort(500)
+        if request.method == 'POST' and form.validate():
+            password = form.password.data
+            user = User.select_user_by_id(reset_user_id)
+            with transaction():
+                user.save_new_password(password)
+                PasswordResetToken.delete_token(token)
+            flash('Updated your password')
+            return redirect(url_for('app.login'))
+    return render_template('password_reset.html')
+
 @bp.route('/forgot_password', methods=['GET', 'POST'])
 def forgot_password():
     form = ForgotPasswordForm()
     if request.method == 'POST' and form.validate():
         email = form.email.data
+        
     return render_template('forgot_password.html', form=form)
 
 @bp.route('/user_info', methods=['GET', 'POST'])
