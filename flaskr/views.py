@@ -4,7 +4,8 @@ from flask import (
 )
 from flask_login import login_user, login_required, logout_user, current_user
 from flaskr.forms import (
-    LoginForm, RegisterForm, PasswordResetForm, UserForm, ForgotPasswordForm
+    LoginForm, RegisterForm, PasswordResetForm, UserForm, ForgotPasswordForm,
+    BookForm
 )
 from flaskr.models import (
     BookInfo, User, transaction, PasswordResetToken
@@ -12,21 +13,22 @@ from flaskr.models import (
 
 bp = Blueprint('app', __name__, url_prefix='')
 
-book_list = [
-        # BookInfo(0, 'はらぺこあおむし', '絵本', 2000, '2023/2/14', 'image/harapekoaomushi.jpg'),
-        # BookInfo(1, 'ぐりとぐら', '絵本', 1500, '2023/2/9', 'image/guritogura.jpg'),
-        # BookInfo(2, '11匹のねこ', '絵本', 1400, '2023/2/20', 'image/11pikinoneko.jpeg'),
-        # BookInfo(3, 'やさしいC', '専門書', 2750, '2017/5/15', 'image/yasashiiC.jpg')
-    ]
+# book_list = [
+#         BookInfo(0, 'はらぺこあおむし', '絵本', 2000, '2023/2/14', 'image/harapekoaomushi.jpg'),
+#         BookInfo(1, 'ぐりとぐら', '絵本', 1500, '2023/2/9', 'image/guritogura.jpg'),
+#         BookInfo(2, '11匹のねこ', '絵本', 1400, '2023/2/20', 'image/11pikinoneko.jpeg'),
+#         BookInfo(3, 'やさしいC', '専門書', 2750, '2017/5/15', 'image/yasashiiC.jpg')
+#     ]
 
 
 @bp.route('/')
 def home():
-    # session['url'] = 'app.home'
     return render_template('home.html')
 
 @bp.route('/newtitle')
 def load_new_title():
+    book_list = None
+    book_list = BookInfo.select_book()
     return render_template('newtitle.html', book_list=book_list)
 
 @bp.route('/book/<int:book_number>')
@@ -64,8 +66,8 @@ def login():
             flash('Incorrect email address/password combination.')
     return render_template('login.html', form=form)
 
-@bp.route('/register', methods=['GET', 'POST'])
-def register():
+@bp.route('/register_users', methods=['GET', 'POST'])
+def register_users():
     form = RegisterForm(request.form)
     if request.method == 'POST' and form.validate():
         user = User(email = form.email.data)
@@ -80,7 +82,7 @@ def register():
             print(f'パスワード設定用URL: http://127.0.0.1:5000/reset_password/{token}')
             flash('パスワード設定用のURLをお送りしました。')
         return redirect(url_for('app.login')) #login関数に遷移
-    return render_template('register.html', form=form) #GETの場合、register.htmlが表示される
+    return render_template('register_users.html', form=form) #GETの場合、register.htmlが表示される
 
 @bp.route('/password_reset/<uuid:token>', methods=['GET', 'POST'])
 def reset_password(token):
@@ -105,7 +107,14 @@ def forgot_password():
     form = ForgotPasswordForm()
     if request.method == 'POST' and form.validate():
         email = form.email.data
-        
+        user = User.select_user_by_email(email)
+        if user:
+            with transaction():
+                token = PasswordResetToken.publish_token(user)
+            print(f'http:/127.0.0.1:5000:password_reset/{token}')
+            flash('')
+        else:
+            flash('User does not exist')
     return render_template('forgot_password.html', form=form)
 
 @bp.route('/user_info', methods=['GET', 'POST'])
@@ -113,12 +122,23 @@ def forgot_password():
 def user_info():
     form = UserForm(request.form)
     if request.method == 'POST' and form.validate():
-        user_id = current_user.get_id()
-        user = User.select_user_by_id(user_id)
-        with transaction():
-            user.username = form.username.data
+        from setup import app
+        with app.app_context():
+            user_id = current_user.get_id()
+            user = User.select_user_by_id(user_id)
+            with transaction():
+                user.username = form.username.data
+                user.email = form.email.data
+            flash('Successfully updated user information')
     return render_template('user_info.html', form=form)
 
-@bp.errorhandler(404) #ページが間違うとmain
-def redirect_main_page(error):
-    return redirect(url_for('home'))
+@bp.route('register_books', methods=['GET', 'POST'])
+def register_books():
+    form = BookForm(request.form)
+    if request.method == 'POST' and form.validate():
+        
+    return render_template('register_books.html', form=form)
+
+@bp.app_errorhandler(404) #ページが間違うとmain
+def redirect_main_page(e):
+    return redirect(url_for('app.home'))

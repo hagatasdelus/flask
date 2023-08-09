@@ -62,3 +62,4 @@ class BookForm(FlaskForm):
                                             ('sports-outdoor', 'スポーツ・アウトドア'), ('enc-alm-books-words', '事典・年鑑・本・ことば'), ('music', '音楽'),
                                             ('travel', '旅行・紀行'), ('pic-child-book', '絵本・児童書'), ('comics', 'コミックス'), ('others', 'その他')])
     arrival_day = DateField('到着日: ', validators=[DataRequired('Please enter data')], format='%Y-%m-%d', render_kw={"placeholder": "yyyy/mm/dd"})
+

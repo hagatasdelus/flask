@@ -30,8 +30,7 @@ class BookInfo(db.Model):
     genre = db.Column(db.String(64), index=True, unique=False, default="割当無し")
     price = db.Column(db.Integer, nullable=False)
     arrival_day = db.Column(db.DateTime, default=datetime.now)
-    picture_path = db.Column(db.String(64), default='static/image/no_image.jpg')
-
+    picture_path = db.Column(db.Text)
 
     def __init__(self, title, price, arrival_day):
         self.title = title
@@ -52,6 +51,12 @@ class BookInfo(db.Model):
         return cls.query.filter(
             cls.genre.like(f'%{genre}%')
         ).order_by(cls.genre).paginate(page=page, per_page=50, error_out=False)
+
+    @classmethod
+    def get_books(cls):
+        return cls.query.order_by(
+            cls.arrival_day.desc()
+        ).limit(10).all()
        
       
 class User(UserMixin, db.Model):
