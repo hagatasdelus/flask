@@ -133,10 +133,22 @@ def user_info():
     return render_template('user_info.html', form=form)
 
 @bp.route('register_books', methods=['GET', 'POST'])
+@login_required
 def register_books():
     form = BookForm(request.form)
     if request.method == 'POST' and form.validate():
-        
+        book = BookInfo(
+            title = form.title.data,
+            price = form.price.data,
+            genre = form.genre.data,
+            arrival_day = form.arrival_day.data
+        )
+        from setup import app
+        with app.app_context():
+            with transaction():
+                book.create_new_book()
+            flash('Book information added')
+        redirect(url_for('app.home'))
     return render_template('register_books.html', form=form)
 
 @bp.app_errorhandler(404) #ページが間違うとmain

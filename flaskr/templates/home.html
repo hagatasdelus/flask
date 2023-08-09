@@ -3,6 +3,9 @@
 ホーム - {{ super() }}
 {% endblock %}
 {% block content %}
+{% for message in get_flashed_messages() %}
+{{ message }}
+{% endfor %}
 <h1>Book Board</h1>
 <h2>ようこそ。Book Boardへ</h2>
 <a>メインページです</a>

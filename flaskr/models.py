@@ -31,9 +31,10 @@ class BookInfo(db.Model):
     arrival_day = db.Column(db.DateTime, default=datetime.now)
     picture_path = db.Column(db.Text)
 
-    def __init__(self, title, price, arrival_day):
+    def __init__(self, title, price, genre, arrival_day):
         self.title = title
         self.price = price
+        self.genre = genre
         self.arrival_day = arrival_day
 
     def create_new_book(self):
