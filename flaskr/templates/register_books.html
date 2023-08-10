@@ -1,15 +1,17 @@
 {% from "_formhelpers.html" import render_field %}
 {% extends "base.html" %}
 {% block title %}
-ユーザ登録 - {{ super() }}
+図書登録 - {{ super() }}
 {% endblock %}
 {% block content %}
-<h1>図書登録画面</h1>
+<h1>図書情報登録画面</h1>
 <div class="row">
-    <form method="POST"> {# 以下で入力されたものはPOSTでlogin関数に戻す。最初はformには何も入らない #}
+    <form method="POST">
         {{ form.csrf_token }}
-        {{ render_field(form.username )}}
-        {{ render_field(form.email) }}
+        {{ render_field(form.title) }}
+        {{ render_field(form.genre) }}
+        {{ render_field(form.price) }}
+        {{ render_field(form.arrival_day) }}
         {{ form.submit() }}
     </form>
 </div>

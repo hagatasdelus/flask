@@ -55,11 +55,12 @@ class UserForm(FlaskForm):
 class BookForm(FlaskForm):
     title = StringField('タイトル: ', validators=[DataRequired()])
     price = IntegerField('値段: ', validators=[NumberRange(0, 10000, 'Incorrect value')])
-    genre = SelectField('ジャンル: ', choices=[('lit-crit', '文学・評論'), ('nonfiction', 'ノンフィクション'), ('biz-econ', 'ビジネス・経済'),
-                                            ('hist-geogr', '歴史・地理'), ('pol-soc', '政治・社会'), ('entertainment', '芸能・エンターエンターテインメント'),
-                                            ('art-arch-des','アート・建築・デザイン'), ('hum-phil-rel', '人文・思想・宗教'), ('liv-hlt-cook', '暮らし・健康・料理'),
-                                            ('sci-tech', 'サイエンス・テクノロジー'), ('hob-prac_use', '趣味・実用'), ('educ-self_dev', '教育・自己啓発'),
-                                            ('sports-outdoor', 'スポーツ・アウトドア'), ('enc-alm-books-words', '事典・年鑑・本・ことば'), ('music', '音楽'),
-                                            ('travel', '旅行・紀行'), ('pic-child-book', '絵本・児童書'), ('comics', 'コミックス'), ('others', 'その他')])
+    genre = SelectField('ジャンル: ', choices=[('文学・評論', '文学・評論'), ('ノンフィクション', 'ノンフィクション'), ('ビジネス・経済', 'ビジネス・経済'),
+           ('歴史・地理', '歴史・地理'), ('政治・社会', '政治・社会'), ('芸能・エンターテインメント', '芸能・エンターテインメント'),
+           ('アート・建築・デザイン', 'アート・建築・デザイン'), ('人文・思想・宗教', '人文・思想・宗教'), ('暮らし・健康・料理', '暮らし・健康・料理'),
+           ('サイエンス・テクノロジー', 'サイエンス・テクノロジー'), ('趣味・実用', '趣味・実用'), ('教育・自己啓発', '教育・自己啓発'),
+           ('スポーツ・アウトドア', 'スポーツ・アウトドア'), ('事典・年鑑・本・ことば', '事典・年鑑・本・ことば'), ('音楽', '音楽'),
+           ('旅行・紀行', '旅行・紀行'), ('絵本・児童書', '絵本・児童書'), ('コミックス', 'コミックス'), ('その他', 'その他')])
     arrival_day = DateField('到着日: ', validators=[DataRequired('Please enter data')], format='%Y-%m-%d', render_kw={"placeholder": "yyyy/mm/dd"})
+    submit = SubmitField('登録')
 

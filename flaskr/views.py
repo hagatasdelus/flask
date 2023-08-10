@@ -51,7 +51,7 @@ def logout():
 def login():
     form = LoginForm(request.form)
     if request.method == 'POST' and form.validate():
-        user = User.select_user_by_email(form.emal.data)
+        user = User.select_user_by_email(form.email.data)
         if user and user.is_active and user.validate_password(form.password.data):
             login_user(user, remember=True)
             next = request.args.get('next')
@@ -70,7 +70,10 @@ def login():
 def register_users():
     form = RegisterForm(request.form)
     if request.method == 'POST' and form.validate():
-        user = User(email = form.email.data)
+        user = User(
+            username = form.username.data,
+            email = form.email.data
+            )
         from setup import app
         with app.app_context():
             with transaction():
@@ -79,7 +82,7 @@ def register_users():
             with transaction():
                 token = PasswordResetToken.publish_token(user)  #* 有効期限1日のランダムな文字列でできたtoken, そのuserのid, tokenの有効期限をDBに追加してtokenを返す
             #メールに飛ばす方が良い(メールが合っているかの確認ができるから)
-            print(f'パスワード設定用URL: http://127.0.0.1:5000/reset_password/{token}')
+            print(f'パスワード設定用URL: http://127.0.0.1:5000/password_reset/{token}')
             flash('パスワード設定用のURLをお送りしました。')
         return redirect(url_for('app.login')) #login関数に遷移
     return render_template('register_users.html', form=form) #GETの場合、register.htmlが表示される
@@ -100,7 +103,7 @@ def reset_password(token):
                 PasswordResetToken.delete_token(token)
             flash('Updated your password')
             return redirect(url_for('app.login'))
-    return render_template('password_reset.html')
+    return render_template('password_reset.html', form=form)
 
 @bp.route('/forgot_password', methods=['GET', 'POST'])
 def forgot_password():
@@ -147,10 +150,14 @@ def register_books():
         with app.app_context():
             with transaction():
                 book.create_new_book()
-            flash('Book information added')
-        redirect(url_for('app.home'))
+            flash('Book registration has been completed')
+        return redirect(url_for('app.newtitle'))
     return render_template('register_books.html', form=form)
 
 @bp.app_errorhandler(404) #ページが間違うとmain
 def redirect_main_page(e):
     return redirect(url_for('app.home'))
+
+@bp.app_errorhandler(500)
+def server_error(e):
+    return render_template('500.html'), 500

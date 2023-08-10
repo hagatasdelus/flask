@@ -74,7 +74,8 @@ class User(UserMixin, db.Model):
     create_at = db.Column(db.DateTime, default=datetime.now)
     update_at = db.Column(db.DateTime, default=datetime.now)
 
-    def __init__(self, email):
+    def __init__(self, username, email):
+        self.username = username
         self.email = email
 
     def validate_password(self, password):
@@ -91,6 +92,10 @@ class User(UserMixin, db.Model):
     def select_user_by_id(cls, id):
         return cls.query.get(id)
     
+    def save_new_password(self, new_password):
+        self.password = generate_password_hash(new_password)
+        self.is_active = True
+
 class PasswordResetToken(db.Model):
 
     __tablename__ = 'password_reset_tokens'

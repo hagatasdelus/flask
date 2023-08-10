@@ -1,5 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
+{% for message in get_flashed_messages() %}
+{{ message }}
+{% endfor %}
 <h2>今月の新刊</h2>
     {% if not book_list %}
         <p>今月の新刊はありません</p>
