@@ -5,7 +5,7 @@ from wtforms.fields import (
 from wtforms import ValidationError
 from wtforms.validators import DataRequired, Email, EqualTo, NumberRange
 from flask_login import current_user
-# from flask import flash
+from flask import flash
 from flaskr.models import User
 
 class LoginForm(FlaskForm):
@@ -21,7 +21,7 @@ class RegisterForm(FlaskForm):
 
     def validate_email(self, field):
         if User.select_user_by_email(field.data):
-            raise ValidationError('メールアドレスはすでに登録されています')
+            raise ValidationError('The email address is already registered.')
 
 class PasswordResetForm(FlaskForm):
     password = PasswordField('パスワード: ',validators=[DataRequired(), EqualTo('confirm_password', message='Password does not match.')])
@@ -39,7 +39,7 @@ class ForgotPasswordForm(FlaskForm):
 
     def validate_email(self, field):
         if not User.select_user_by_email(field.data): #DBからそのEmailを取ってこれなかったら
-            raise ValidationError('そのメールアドレスは存在しません')
+            raise ValidationError('That email address does not exist.')
         
 class UserForm(FlaskForm):
     email = StringField('メール: ', validators=[DataRequired(), Email('メールアドレスが誤っています')])
@@ -52,7 +52,7 @@ class UserForm(FlaskForm):
         user = User.select_user_by_email(self.email.data)
         if user:
             if user.id != int(current_user.get_id()):
-                #なんか処理
+                flash('The email address is already registered.')
                 return False
         return True
 
@@ -68,6 +68,12 @@ class BookForm(FlaskForm):
     arrival_day = DateField('到着日: ', validators=[DataRequired('Please enter data')], format='%Y-%m-%d', render_kw={"placeholder": "yyyy/mm/dd"})
     user_id = HiddenField()
     submit = SubmitField('登録')
+
+    def validate_title(self, field):
+        profanity_words = ['badword1', 'badword2']
+        for word in profanity_words:
+            if word in field.data:
+                raise ValidationError('Contains a word that cannot be used.')
 
 class ChangePasswordForm(FlaskForm):
     password = PasswordField('パスワード: ', validators=[DataRequired(), EqualTo('confirm_password', message='Password does not match.')])

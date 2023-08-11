@@ -75,7 +75,7 @@ def register_users():
                 token = PasswordResetToken.publish_token(user)  #* 有効期限1日のランダムな文字列でできたtoken, そのuserのid, tokenの有効期限をDBに追加してtokenを返す
             #メールに飛ばす方が良い(メールが合っているかの確認ができるから)
             print(f'パスワード設定用URL: http://127.0.0.1:5000/password_reset/{token}')
-            flash('パスワード設定用のURLをお送りしました。')
+            flash('We have sent you the URL to set the password.')
         return redirect(url_for('app.login')) #login関数に遷移
     return render_template('register_users.html', form=form) #GETの場合、register.htmlが表示される
 
@@ -168,14 +168,16 @@ def register_books():
 def confirm_delete(id):
     form = DeleteBookForm(request.form)
     book = BookInfo.get_book_by_id(id)
+    if not book:
+        flash('The book is not registered.')
+        return redirect(url_for('app.newtitle'))
     if request.method == 'POST' and form.validate():
-        # book = BookInfo.get_book_by_id(id)
         if book.user_id == int(current_user.get_id()):
             with transaction():
                 book.delete_book(id)
-            flash(f'"{book.title}"を削除しました')
+            flash(f'Removed "{book.title}".')
             return redirect(url_for('app.newtitle'))
-        flash('削除権限がありません')
+        flash('You do not have permission to delete.')
         return redirect(url_for('app.newtitle'))
     form.id.data = id
     return render_template('confirm_delete.html', form=form, book=book)
