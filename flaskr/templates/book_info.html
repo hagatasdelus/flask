@@ -1,0 +1,30 @@
+{% from "_formhelpers.html" import render_field %}
+{% extends "base.html" %}
+{% block title %}
+図書情報編集画面 - {{ super() }}
+{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 offset-lg-4">
+        {% for message in get_flashed_messages() %}
+        {{ message }}
+        {% endfor %}
+    </div>
+    <div class="col-lg-2 offset-lg-2">
+        {% if book.picture_path %}
+        <img class="book-image-big" src="{{url_for('static', filename=book.picture_path)}}">
+        {% endif %}
+    </div>
+    <div class="col-lg-4 offset-lg-2">
+        <form method="POST" enctype="multipart/form-data">
+            {{form.csrf_token}}
+            {{render_field(form.title, value=book.title)}}
+            {{render_field(form.genre, value=book.genre)}}
+            {{render_field(form.price, value=book.price)}}
+            {{render_field(form.arrival_day, value=book.arrival_day)}}
+            {{render_field(form.picture_path)}}
+            {{form.submit()}}
+        </form>
+    </div>
+</div>
+{% endblock %}

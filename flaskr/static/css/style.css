@@ -1,0 +1,14 @@
+.book-image-big{
+    width: 250px;
+    height: 250px;
+}
+
+.book-image-small{
+    width: 100px;
+    height: 100px;
+}
+
+.book-image-mini{
+    width: 50px;
+    height: 50px;
+}

@@ -5,11 +5,13 @@ from flask import (
 from flask_login import login_user, login_required, logout_user, current_user
 from flaskr.forms import (
     LoginForm, RegisterForm, PasswordResetForm, UserForm, ForgotPasswordForm,
-    BookForm, ChangePasswordForm, DeleteBookForm
+    RegisterBookForm, ChangePasswordForm, DeleteBookForm, BookForm
 )
 from flaskr.models import (
     BookInfo, User, transaction, PasswordResetToken
 )
+from flaskr import db
+from datetime import datetime
 
 bp = Blueprint('app', __name__, url_prefix='')
 
@@ -23,12 +25,34 @@ def newtitle():
     book_list = BookInfo.get_books()
     return render_template('newtitle.html', book_list=book_list)
 
-@bp.route('/book/<int:id>')
+@bp.route('newtitle/book/<int:id>')
 def book_detail(id):
     book = BookInfo.get_book_by_id(id)
     if book:
         return render_template('book_detail.html', book=book)
     return redirect(url_for('app.home'))
+
+@bp.route('/newtitle/book/<int:id>/info', methods=['GET', 'POST'])
+@login_required
+def book_info(id):
+    form = BookForm(request.form)
+    book = BookInfo.get_book_by_id(id)
+    if request.method == 'POST' and form.validate():
+        from setup import app
+        with app.app_context():
+            with transaction():
+                book.title = form.title.data
+                book.price = form.price.data
+                book.genre = form.genre.data
+                book.arrival_day = form.arrival_day.data
+                file = request.files[form.picture_path.name].read()
+                if file: #requestした結果取得できたら
+                    file_name = str(id) + '_' + str(int(datetime.now().timestamp())) + '.jpg'
+                    picture_path = 'flaskr/static/book_image/' + file_name #ファイルの保存先(flaskr/static/user_image/picture)
+                    open(picture_path, 'wb').write(file) #formから受け取ったファイルをバイナリー型なのでwbで書み込む。wb: writebinary
+                    book.picture_path = 'book_image/' + file_name #formで取得したpicture_pathを入れる。picture_pathからtemplatesで画面上に画像を表示できる
+            flash('図書登録情報の更新に成功しました')
+    return render_template('book_info.html', form=form, book=book)
 
 @bp.route('/terms')
 def terms_of_service():
@@ -146,7 +170,7 @@ def change_password():
 @bp.route('register_books', methods=['GET', 'POST'])
 @login_required
 def register_books():
-    form = BookForm(request.form)
+    form = RegisterBookForm(request.form)
     if request.method == 'POST' and form.validate():
         book = BookInfo(
             title = form.title.data,
@@ -163,7 +187,7 @@ def register_books():
         return redirect(url_for('app.newtitle'))
     return render_template('register_books.html', form=form)
 
-@bp.route('confirm_delete/<id>', methods=['GET', 'POST'])
+@bp.route('newtitle/confirm_delete/<id>', methods=['GET', 'POST'])
 @login_required
 def confirm_delete(id):
     form = DeleteBookForm(request.form)
