@@ -16,7 +16,7 @@ def transaction():
         db.session.rollback()
         raise
 
-@login_manager.user_loader #htmlのcurrent_user.is_authenticatedでユーザ情報を取りに来る。ユーザが既に認証されたのかを確認できる
+@login_manager.user_loader
 def load_user(user_id):
     return User.query.get(user_id)
 
@@ -26,31 +26,33 @@ class BookInfo(db.Model):
     
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(64), index=True, nullable=False)
-    genre = db.Column(db.String(64), index=True, unique=False, default="割当無し")
+    genre = db.Column(db.String(64), index=True, unique=False)
     price = db.Column(db.Integer, nullable=False)
     arrival_day = db.Column(db.DateTime, default=datetime.now)
     picture_path = db.Column(db.Text)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
-    def __init__(self, title, price, genre, arrival_day):
+    def __init__(self, title, price, genre, arrival_day, user_id):
         self.title = title
         self.price = price
         self.genre = genre
         self.arrival_day = arrival_day
+        self.user_id = user_id
 
     def create_new_book(self):
         db.session.add(self)
     
-    @classmethod
-    def select_book_by_title(cls, title, page=1):
-        return cls.query.filter(
-            cls.title.like(f'%{title}%')
-        ).order_by(cls.title).paginate(page=page, per_page=50, error_out=False)
+    # @classmethod
+    # def select_book_by_title(cls, title, page=1):
+    #     return cls.query.filter(
+    #         cls.title.like(f'%{title}%')
+    #     ).order_by(cls.title).paginate(page=page, per_page=50, error_out=False)
     
-    @classmethod
-    def select_book_by_genre(cls, genre, page=1):
-        return cls.query.filter(
-            cls.genre.like(f'%{genre}%')
-        ).order_by(cls.genre).paginate(page=page, per_page=50, error_out=False)
+    # @classmethod
+    # def select_book_by_genre(cls, genre, page=1):
+    #     return cls.query.filter(
+    #         cls.genre.like(f'%{genre}%')
+    #     ).order_by(cls.genre).paginate(page=page, per_page=50, error_out=False)
 
     @classmethod
     def get_books(cls):
@@ -61,6 +63,10 @@ class BookInfo(db.Model):
     @classmethod
     def get_book_by_id(cls, id):
         return cls.query.get(id)
+    
+    @classmethod
+    def delete_book(cls, id):    
+        cls.query.filter_by(id=int(id)).delete()
       
 class User(UserMixin, db.Model):
 
@@ -127,13 +133,12 @@ class PasswordResetToken(db.Model):
             datetime.now() + timedelta(days=1)
         )
         db.session.add(new_token)
-        return token #* 有効期限1日のランダムな文字列でできたtoken, そのuserのidをDBに追加してtokenを返す
+        return token
     
     @classmethod
     def get_user_id_by_token(cls, token):
         now = datetime.now()
         record = cls.query.filter_by(token=str(token)).filter(cls.expire_at > now).first()  #expire_atが現在時刻よりもすぎていない.
-        """tokenカラムにある文字型のpublish_tokenにより返されたtokenと同じものを検索し、expire_atが有効期限内であるものの一番最初に出てきたもの。"""
         if record:
             return record.user_id
         else:
@@ -141,4 +146,4 @@ class PasswordResetToken(db.Model):
         
     @classmethod
     def delete_token(cls, token):    
-        cls.query.filter_by(token=str(token)).delete() #tokenカラムにある文字型のpublish_tokenにより返されたtokenと同じものを検索し,それを削除する
+        cls.query.filter_by(token=str(token)).delete()

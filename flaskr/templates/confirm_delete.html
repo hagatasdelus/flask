@@ -1,0 +1,11 @@
+{% from "_formhelpers.html" import render_field %}
+{% extends "base.html" %}
+{% block content %}
+<h2>本の情報の削除</h2>
+<p>"{{ book.title }}"を本当に削除しますか？</p>
+<form action="{{ url_for('app.confirm_delete', id=book.id) }}" method="post">
+    {{ form.csrf_token }}
+    {{ form.id }}
+    {{ form.submit }}
+</form>
+{% endblock %}

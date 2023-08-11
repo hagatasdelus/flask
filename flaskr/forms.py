@@ -24,9 +24,13 @@ class RegisterForm(FlaskForm):
             raise ValidationError('メールアドレスはすでに登録されています')
 
 class PasswordResetForm(FlaskForm):
-    password = PasswordField('パスワード: ',validators=[DataRequired(), EqualTo('confirm_password', message='パスワード不一致')])
+    password = PasswordField('パスワード: ',validators=[DataRequired(), EqualTo('confirm_password', message='Password does not match.')])
     confirm_password = PasswordField('パスワード確認: ', validators=[DataRequired()])
     submit = SubmitField('パスワード更新')
+
+    def validate_email(self, field):
+        if len(field.data) < 8:
+            raise ValidationError('Password must be at least 8 characters.')
 
 
 class ForgotPasswordForm(FlaskForm):
@@ -39,7 +43,7 @@ class ForgotPasswordForm(FlaskForm):
         
 class UserForm(FlaskForm):
     email = StringField('メール: ', validators=[DataRequired(), Email('メールアドレスが誤っています')])
-    username = StringField('利用者ID: ', validators=[DataRequired()])
+    username = StringField('ユーザー名: ', validators=[DataRequired()])
     submit = SubmitField('登録情報更新')
 
     def validate(self):
@@ -62,5 +66,18 @@ class BookForm(FlaskForm):
            ('スポーツ・アウトドア', 'スポーツ・アウトドア'), ('事典・年鑑・本・ことば', '事典・年鑑・本・ことば'), ('音楽', '音楽'),
            ('旅行・紀行', '旅行・紀行'), ('絵本・児童書', '絵本・児童書'), ('コミックス', 'コミックス'), ('その他', 'その他')])
     arrival_day = DateField('到着日: ', validators=[DataRequired('Please enter data')], format='%Y-%m-%d', render_kw={"placeholder": "yyyy/mm/dd"})
+    user_id = HiddenField()
     submit = SubmitField('登録')
 
+class ChangePasswordForm(FlaskForm):
+    password = PasswordField('パスワード: ', validators=[DataRequired(), EqualTo('confirm_password', message='Password does not match.')])
+    confirm_password = PasswordField('パスワード確認: ', validators=[DataRequired()])
+    submit = SubmitField('パスワード更新')
+
+    def validate_email(self, field):
+        if len(field.data) < 8:
+            raise ValidationError('Password must be at least 8 characters.')
+
+class DeleteBookForm(FlaskForm):
+    id = HiddenField()
+    submit = SubmitField('削除')

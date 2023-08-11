@@ -20,6 +20,11 @@
                         </a>   
                     </td>
                     <td>{{ book.price }}円</td>
+                    <td>
+                        <a href="{{ url_for('app.confirm_delete', id=book.id) }}">
+                            削除
+                        </a>
+                    </td>
                 </tr>
             {% endfor %}
         </table>

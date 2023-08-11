@@ -5,21 +5,13 @@ from flask import (
 from flask_login import login_user, login_required, logout_user, current_user
 from flaskr.forms import (
     LoginForm, RegisterForm, PasswordResetForm, UserForm, ForgotPasswordForm,
-    BookForm
+    BookForm, ChangePasswordForm, DeleteBookForm
 )
 from flaskr.models import (
     BookInfo, User, transaction, PasswordResetToken
 )
 
 bp = Blueprint('app', __name__, url_prefix='')
-
-# book_list = [
-#         BookInfo(0, 'はらぺこあおむし', '絵本', 2000, '2023/2/14', 'image/harapekoaomushi.jpg'),
-#         BookInfo(1, 'ぐりとぐら', '絵本', 1500, '2023/2/9', 'image/guritogura.jpg'),
-#         BookInfo(2, '11匹のねこ', '絵本', 1400, '2023/2/20', 'image/11pikinoneko.jpeg'),
-#         BookInfo(3, 'やさしいC', '専門書', 2750, '2017/5/15', 'image/yasashiiC.jpg')
-#     ]
-
 
 @bp.route('/')
 def home():
@@ -135,6 +127,22 @@ def user_info():
             flash('Successfully updated user information')
     return render_template('user_info.html', form=form)
 
+@bp.route('/change_password', methods=['GET', 'POST'])
+@login_required
+def change_password():
+    form = ChangePasswordForm(request.form)
+    if request.method == 'POST' and form.validate():
+        from setup import app
+        with app.app_context():
+            user = User.select_user_by_id(current_user.get_id())
+            password = form.password.data
+            with transaction():
+                user.save_new_password(password)
+            flash('Password updated successfully.')
+            return redirect(url_for('app.user_info'))
+    return render_template('change_password.html', form=form)
+
+
 @bp.route('register_books', methods=['GET', 'POST'])
 @login_required
 def register_books():
@@ -144,7 +152,8 @@ def register_books():
             title = form.title.data,
             price = form.price.data,
             genre = form.genre.data,
-            arrival_day = form.arrival_day.data
+            arrival_day = form.arrival_day.data,
+            user_id = current_user.get_id()
         )
         from setup import app
         with app.app_context():
@@ -153,6 +162,24 @@ def register_books():
             flash('Book registration has been completed')
         return redirect(url_for('app.newtitle'))
     return render_template('register_books.html', form=form)
+
+@bp.route('confirm_delete/<id>', methods=['GET', 'POST'])
+@login_required
+def confirm_delete(id):
+    form = DeleteBookForm(request.form)
+    book = BookInfo.get_book_by_id(id)
+    if request.method == 'POST' and form.validate():
+        # book = BookInfo.get_book_by_id(id)
+        if book.user_id == int(current_user.get_id()):
+            with transaction():
+                book.delete_book(id)
+            flash(f'"{book.title}"を削除しました')
+            return redirect(url_for('app.newtitle'))
+        flash('削除権限がありません')
+        return redirect(url_for('app.newtitle'))
+    form.id.data = id
+    return render_template('confirm_delete.html', form=form, book=book)
+    
 
 @bp.app_errorhandler(404) #ページが間違うとmain
 def redirect_main_page(e):
