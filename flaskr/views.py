@@ -5,10 +5,10 @@ from flask import (
 from flask_login import login_user, login_required, logout_user, current_user
 from flaskr.forms import (
     LoginForm, RegisterForm, PasswordResetForm, UserForm, ForgotPasswordForm,
-    RegisterBookForm, ChangePasswordForm, DeleteBookForm, BookForm
+    RegisterBookForm, ChangePasswordForm, DeleteBookForm, BookForm, BoardForm
 )
 from flaskr.models import (
-    BookInfo, User, transaction, PasswordResetToken
+    BookInfo, User, transaction, PasswordResetToken, Board
 )
 from flaskr import db
 from datetime import datetime
@@ -209,6 +209,12 @@ def confirm_delete(id):
     form.id.data = id
     return render_template('confirm_delete.html', form=form, book=book)
     
+@bp.route('/newtitle/book/<int:id>/board', methods=['GET', 'POST'])
+@login_required
+def board(id):
+    form = BoardForm(request.form)
+    posts = Board.get_posts()
+    return render_template('board.html', form=form, posts=posts)
 
 @bp.app_errorhandler(404) #ページが間違うとmain
 def redirect_main_page(e):

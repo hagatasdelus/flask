@@ -146,3 +146,20 @@ class PasswordResetToken(db.Model):
     @classmethod
     def delete_token(cls, token):    
         cls.query.filter_by(token=str(token)).delete()
+
+class Board(db.Model):
+
+    __tablename__ = 'boards'
+
+    id = db.Column(db.Integer, primary_key=True)
+    from_user_id = db.Column(db.Integer, db.ForeignKey('users.id'), index=True)
+    post = db.Column(db.Text)
+    create_at = db.Column(db.DateTime, default=datetime.now)
+    update_at = db.Column(db.DateTime, default=datetime.now)
+
+    def __init__(self, from_user_id, post):
+        self.from_user_id = from_user_id
+        self.post = post
+
+    def create_post(self):
+        db.session.add(self)

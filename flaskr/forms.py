@@ -1,7 +1,8 @@
 from flask_wtf import FlaskForm
 from wtforms.fields import (
     StringField, PasswordField, SubmitField, HiddenField,
-    IntegerField, DateField, SelectField, FileField
+    IntegerField, DateField, SelectField, FileField,
+    TextAreaField
 )
 from wtforms import ValidationError
 from wtforms.validators import (
@@ -109,3 +110,7 @@ class BookForm(FlaskForm):
         profanity_pattern = '|'.join(profanity_words)
         if re.search(profanity_pattern, field.data, re.IGNORECASE):
             raise ValidationError('Contains a word that cannot be used.')
+
+class BoardForm(FlaskForm):
+    post = TextAreaField()
+    submit = SubmitField('Send')
