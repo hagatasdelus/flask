@@ -36,23 +36,23 @@ def book_detail(id):
 @login_required
 def book_info(id):
     form = BookForm(request.form)
-    book = BookInfo.get_book_by_id(id)
-    if request.method == 'POST' and form.validate():
-        from setup import app
-        with app.app_context():
+    from setup import app
+    with app.app_context():
+        book = BookInfo.get_book_by_id(id)
+        if request.method == 'POST' and form.validate():
             with transaction():
                 book.title = form.title.data
                 book.price = form.price.data
                 book.genre = form.genre.data
                 book.arrival_day = form.arrival_day.data
                 file = request.files[form.picture_path.name].read()
-                if file: #requestした結果取得できたら
+                if file:
                     file_name = str(id) + '_' + str(int(datetime.now().timestamp())) + '.jpg'
-                    picture_path = 'flaskr/static/book_image/' + file_name #ファイルの保存先(flaskr/static/user_image/picture)
-                    open(picture_path, 'wb').write(file) #formから受け取ったファイルをバイナリー型なのでwbで書み込む。wb: writebinary
-                    book.picture_path = 'book_image/' + file_name #formで取得したpicture_pathを入れる。picture_pathからtemplatesで画面上に画像を表示できる
+                    picture_path = 'flaskr/static/book_image/' + file_name
+                    open(picture_path, 'wb').write(file)
+                    book.picture_path = 'book_image/' + file_name
             flash('図書登録情報の更新に成功しました')
-    return render_template('book_info.html', form=form, book=book)
+        return render_template('book_info.html', form=form, book=book)
 
 @bp.route('/terms')
 def terms_of_service():
