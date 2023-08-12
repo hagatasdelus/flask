@@ -2,6 +2,11 @@
 {% block content %}
 {# <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}"> #}
 <div class="row">
+    <div class="col-lg-8">
+        {% for message in get_flashed_messages() %}
+        {{ message }}
+        {% endfor %}
+    </div>
     <div class="col-lg-8 offset-lg-4">
         {% if book.picture_path %}
         <img class="book-image-big" src="{{ url_for('static', filename=book.picture_path) }}">

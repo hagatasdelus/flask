@@ -28,7 +28,7 @@ class BookInfo(db.Model):
     title = db.Column(db.String(64), index=True, nullable=False)
     genre = db.Column(db.String(64), index=True, unique=False)
     price = db.Column(db.Integer, nullable=False)
-    arrival_day = db.Column(db.DateTime, default=datetime.now)
+    arrival_day = db.Column(db.Date, default=datetime.now().date)
     picture_path = db.Column(db.Text)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
@@ -123,7 +123,6 @@ class PasswordResetToken(db.Model):
         self.user_id = user_id
         self.expire_at = expire_at
 
-    """パスワード設定用のURLを生成"""
     @classmethod
     def publish_token(cls, user):
         token = str(uuid4())

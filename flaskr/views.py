@@ -39,6 +39,9 @@ def book_info(id):
     from setup import app
     with app.app_context():
         book = BookInfo.get_book_by_id(id)
+        if book.user_id != int(current_user.get_id()):
+            flash('You do not have permission to update.')
+            return redirect(url_for('app.book_detail', id=id))
         if request.method == 'POST' and form.validate():
             with transaction():
                 book.title = form.title.data
@@ -51,7 +54,7 @@ def book_info(id):
                     picture_path = 'flaskr/static/book_image/' + file_name
                     open(picture_path, 'wb').write(file)
                     book.picture_path = 'book_image/' + file_name
-            flash('図書登録情報の更新に成功しました')
+            flash('Book registration information has been successfully updated.')
         return render_template('book_info.html', form=form, book=book)
 
 @bp.route('/terms')
