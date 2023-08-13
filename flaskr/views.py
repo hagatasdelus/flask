@@ -27,7 +27,7 @@ def newtitle():
 
 @bp.route('newtitle/book/<int:id>')
 def book_detail(id):
-    book = BookInfo.get_book_by_id(id)
+    book = BookInfo.select_book_by_id(id)
     if book:
         return render_template('book_detail.html', book=book)
     return redirect(url_for('app.home'))
@@ -38,7 +38,7 @@ def book_info(id):
     form = BookForm(request.form)
     from setup import app
     with app.app_context():
-        book = BookInfo.get_book_by_id(id)
+        book = BookInfo.select_book_by_id(id)
         if book.user_id != int(current_user.get_id()):
             flash('You do not have permission to update.')
             return redirect(url_for('app.book_detail', id=id))
@@ -194,7 +194,7 @@ def register_books():
 @login_required
 def confirm_delete(id):
     form = DeleteBookForm(request.form)
-    book = BookInfo.get_book_by_id(id)
+    book = BookInfo.select_book_by_id(id)
     if not book:
         flash('The book is not registered.')
         return redirect(url_for('app.newtitle'))
@@ -213,7 +213,17 @@ def confirm_delete(id):
 @login_required
 def board(id):
     form = BoardForm(request.form)
-    posts = Board.get_posts()
+    book = BookInfo.select_book_by_id(id)
+    posts = Board.get_book_posts(id)
+    if request.method == 'POST' and form.validate():
+        new_post = Board(
+            current_user.get_id(),
+            id,
+            form.post.data
+        )
+        with transaction():
+            new_post.create_post()
+        return redirect(url_for('app.board', id=id))
     return render_template('board.html', form=form, posts=posts)
 
 @bp.app_errorhandler(404) #ページが間違うとmain

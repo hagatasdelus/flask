@@ -112,5 +112,6 @@ class BookForm(FlaskForm):
             raise ValidationError('Contains a word that cannot be used.')
 
 class BoardForm(FlaskForm):
+    book_id = HiddenField()
     post = TextAreaField()
     submit = SubmitField('Send')

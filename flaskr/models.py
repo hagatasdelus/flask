@@ -2,7 +2,7 @@ from flaskr import db, login_manager
 from flask_bcrypt import generate_password_hash, check_password_hash
 from flask_login import UserMixin, current_user
 # from sqlalchemy.orm import aliased
-# from sqlalchemy import and_, or_, desc
+from sqlalchemy import and_, or_, desc
 from datetime import datetime, timedelta
 from contextlib import contextmanager
 from uuid import uuid4
@@ -61,7 +61,7 @@ class BookInfo(db.Model):
         ).limit(10).all()
     
     @classmethod
-    def get_book_by_id(cls, id):
+    def select_book_by_id(cls, id):
         return cls.query.get(id)
     
     @classmethod
@@ -152,14 +152,21 @@ class Board(db.Model):
     __tablename__ = 'boards'
 
     id = db.Column(db.Integer, primary_key=True)
+    book_id = db.Column(db.Integer, db.ForeignKey('book_infos.id'), index=True))
     from_user_id = db.Column(db.Integer, db.ForeignKey('users.id'), index=True)
     post = db.Column(db.Text)
     create_at = db.Column(db.DateTime, default=datetime.now)
     update_at = db.Column(db.DateTime, default=datetime.now)
 
-    def __init__(self, from_user_id, post):
+    def __init__(self, from_user_id, book_id, post):
         self.from_user_id = from_user_id
+        self.book_id = book_id
         self.post = post
 
     def create_post(self):
         db.session.add(self)
+
+
+    @classmethod
+    def get_book_posts(cls, book_id):
+        return cls.query.filter_by(book_id=book_id).order_by(desc(cls.id)).all()
