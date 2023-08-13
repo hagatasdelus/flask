@@ -224,7 +224,7 @@ def board(id):
         with transaction():
             new_post.create_post()
         return redirect(url_for('app.board', id=id))
-    return render_template('board.html', form=form, posts=posts)
+    return render_template('board.html', form=form, posts=posts, book=book)
 
 @bp.app_errorhandler(404) #ページが間違うとmain
 def redirect_main_page(e):

@@ -1,8 +1,8 @@
 from flaskr import db, login_manager
 from flask_bcrypt import generate_password_hash, check_password_hash
 from flask_login import UserMixin, current_user
-# from sqlalchemy.orm import aliased
-from sqlalchemy import and_, or_, desc
+from sqlalchemy.orm import relationship
+from sqlalchemy import desc
 from datetime import datetime, timedelta
 from contextlib import contextmanager
 from uuid import uuid4
@@ -80,6 +80,8 @@ class User(UserMixin, db.Model):
     create_at = db.Column(db.DateTime, default=datetime.now)
     update_at = db.Column(db.DateTime, default=datetime.now)
 
+    boards = relationship("Board", back_populates="user")
+
     def __init__(self, username, email):
         self.username = username
         self.email = email
@@ -152,11 +154,13 @@ class Board(db.Model):
     __tablename__ = 'boards'
 
     id = db.Column(db.Integer, primary_key=True)
-    book_id = db.Column(db.Integer, db.ForeignKey('book_infos.id'), index=True))
+    book_id = db.Column(db.Integer, db.ForeignKey('book_infos.id'), index=True)
     from_user_id = db.Column(db.Integer, db.ForeignKey('users.id'), index=True)
     post = db.Column(db.Text)
     create_at = db.Column(db.DateTime, default=datetime.now)
     update_at = db.Column(db.DateTime, default=datetime.now)
+
+    user = relationship("User", back_populates="boards")
 
     def __init__(self, from_user_id, book_id, post):
         self.from_user_id = from_user_id
