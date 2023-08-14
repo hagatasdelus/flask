@@ -12,6 +12,7 @@ from flaskr.models import (
 )
 from flaskr import db
 from datetime import datetime
+import os
 
 bp = Blueprint('app', __name__, url_prefix='')
 
@@ -202,6 +203,10 @@ def confirm_delete(id):
         if book.user_id == int(current_user.get_id()):
             with transaction():
                 book.delete_book(id)
+                Board.delete_posts_by_book_id(id)
+                if book.picture_path:
+                    app_root = os.path.dirname(os.path.abspath(__file__))
+                    os.remove(os.path.join(app_root, 'static', book.picture_path))
             flash(f'Removed "{book.title}".')
             return redirect(url_for('app.newtitle'))
         flash('You do not have permission to delete.')

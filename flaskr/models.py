@@ -174,3 +174,7 @@ class Board(db.Model):
     @classmethod
     def get_book_posts(cls, book_id):
         return cls.query.filter_by(book_id=book_id).order_by(desc(cls.id)).all()
+    
+    @classmethod
+    def delete_posts_by_book_id(cls, book_id):
+        return cls.query.filter_by(book_id=book_id).delete()
