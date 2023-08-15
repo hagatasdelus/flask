@@ -2,7 +2,7 @@ from flaskr import db, login_manager
 from flask_bcrypt import generate_password_hash, check_password_hash
 from flask_login import UserMixin, current_user
 from sqlalchemy.orm import relationship
-from sqlalchemy import desc
+from sqlalchemy import desc, and_
 from datetime import datetime, timedelta
 from contextlib import contextmanager
 from uuid import uuid4
@@ -157,6 +157,7 @@ class Board(db.Model):
     book_id = db.Column(db.Integer, db.ForeignKey('book_infos.id'), index=True)
     from_user_id = db.Column(db.Integer, db.ForeignKey('users.id'), index=True)
     post = db.Column(db.Text)
+    is_read = db.Column(db.Boolean, default=False) #既読か
     create_at = db.Column(db.DateTime, default=datetime.now)
     update_at = db.Column(db.DateTime, default=datetime.now)
 
@@ -170,11 +171,25 @@ class Board(db.Model):
     def create_post(self):
         db.session.add(self)
 
-
     @classmethod
-    def get_book_posts(cls, book_id):
-        return cls.query.filter_by(book_id=book_id).order_by(desc(cls.id)).all()
+    def get_book_posts(cls, book_id, offset_value=0, limit_value=100):
+        return cls.query.filter_by(
+            book_id=book_id
+        ).order_by(
+            desc(cls.id)
+        ).offset(offset_value).limit(limit_value).all()
     
     @classmethod
     def delete_posts_by_book_id(cls, book_id):
-        return cls.query.filter_by(book_id=book_id).delete()
+        return cls.query.filter_by(
+                book_id=book_id
+            ).delete()
+    
+    @classmethod
+    def select_not_read_posts(cls, book_id):
+        return cls.query.filter(
+            and_(
+                cls.book_id == book_id,
+                cls.is_read == 0 #まだ読まれていないもの
+            )
+        ).order_by(cls.id).all()
