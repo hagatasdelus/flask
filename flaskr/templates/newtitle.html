@@ -25,6 +25,11 @@
                             削除
                         </a>
                     </td>
+                    <td>
+                        <a href="{{ url_for('app.board', id=book.id) }}">
+                            掲示板
+                        </a>
+                    </td>
                 </tr>
             {% endfor %}
         </table>

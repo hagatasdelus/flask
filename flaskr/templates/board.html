@@ -1,7 +1,39 @@
 {% from "_formhelpers.html" import render_field %}
 {% extends "base.html" %}
 {% block title %}
-図書掲示板 - {{ super() }}
+掲示板 - {{ super() }}
 {% endblock %}
 {% block content %}
+<div class="row">
+    {% for post in posts|reverse %}
+        {% if post.from_user_id == current_user.id %} {#メッセージの送信主がログインユーザの場合右側にmessageを表示する#}
+        <div class="speech-bubble-self col-lg-4 col-md-8 col-sm-8 col-9">
+            {% for splitted_message in post.post|replace_newline %} {#\nの改行コードが区切られた形でこのメッセージを変換してループ文で回す#}
+            <p>{{splitted_message|urlize}}</p>
+            {% endfor %}
+        </div>
+        <div class="col-lg-1 col-md-1 col-sm-2 col-2"> {#ピクチャの表示に2だけ使用する#}
+            <p>{{current_user.username}}</p>{#画像の下に名前#}
+        </div>
+        {% else %} {#相手からのメッセージの場合左側#}
+        <div class="col-lg-1 col-md-1 col-sm-2 col-2">
+            <p>{{post.user.username}}</p>{#画像の下に名前#}
+        </div>
+        <div class="speech-bubble-dest col-lg-4 col-md-8 col-sm-8 col-9"> {#中くらいは画面は8の大きさ、小さい画面は8の大きさ、一番小さい画面は9#}
+            {% for splitted_message in post.post|replace_newline %} {#\nの改行コードが区切られた形でこのメッセージを変換してループ文で回す#}
+            <p>{{splitted_message|urlize}}</p>
+            {% endfor %}
+        </div>
+        <div class="col-lg-7 col-md-3 col-sm-1 col-1"></div>{#あまりをdivで埋める#}
+        {% endif %}
+    {% endfor %}
+    <div id="message-form" class="col-lg-4 offset-lg-7 col-md-8 offset-md-4 col-sm-12 col-12">{#messageを送信するフォーム#}
+        <form method="POST">
+            {{ form.csrf_token }}
+            {{ render_field(form.post, cols="50", rows="5")}} {#横に50文字縦に5文字#}
+            {{ form.submit() }}
+        </form>
+    </div>
+</div>
+
 {% endblock %}
