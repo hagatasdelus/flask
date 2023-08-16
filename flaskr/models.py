@@ -157,7 +157,7 @@ class Board(db.Model):
     book_id = db.Column(db.Integer, db.ForeignKey('book_infos.id'), index=True)
     from_user_id = db.Column(db.Integer, db.ForeignKey('users.id'), index=True)
     post = db.Column(db.Text)
-    is_read = db.Column(db.Boolean, default=False) #既読か
+    is_read = db.Column(db.Boolean, default=False)
     create_at = db.Column(db.DateTime, default=datetime.now)
     update_at = db.Column(db.DateTime, default=datetime.now)
 
@@ -186,10 +186,17 @@ class Board(db.Model):
             ).delete()
     
     @classmethod
+    def update_is_read_by_ids(cls, ids):
+        cls.query.filter(cls.id.in_(ids)).update(
+            {'is_read': True},
+            synchronize_session='fetch'
+        )
+
+    @classmethod
     def select_not_read_posts(cls, book_id):
         return cls.query.filter(
             and_(
                 cls.book_id == book_id,
-                cls.is_read == 0 #まだ読まれていないもの
+                cls.is_read == 0
             )
         ).order_by(cls.id).all()

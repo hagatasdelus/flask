@@ -22,7 +22,7 @@ def make_post_format(posts):
             </div>
             <div class="col-lg-7 col-md-3 col-sm-1 col-1"></div>
         '''
-        print(post_tag)
+        # print(post_tag)
     return post_tag
 
 

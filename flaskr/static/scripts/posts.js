@@ -11,15 +11,9 @@ function get_new_posts(){
     $.getJSON("/post_ajax", { //Ajaxを使ってメッセージを取得する
         book_id: book_id //jinjaで取得した相手のuser_idをrequest.args.getでuser_idとしてpost_ajaxに渡す
     }, function(data){//post_ajaxより返されたものを全てdata(views.pyの返り値dataとはまた違う)に入れる
-        console.log('test 1')
+        //console.log('test 1')
         $('#post-form').before(data['data']); //formのdivのidを指定しており、formのちょうど上(before)にメッセージが新たに追加される. view.pyよりdata返される
-        console.log('test 2')
-        // 返ってきたdataの'data'という返り値
-        // var checked_post_ids = data['checked_post_ids'] //checked_post_idsにdataの'checked_post_ids'をリストに入れる.チ
-        // for(let idx = 0; idx < checked_post_ids.length; idx++){ //checked_post_idsの分だけループ letはそのスコープ内でしか影響せず、他のidxに干渉しない
-        //     $('#self-post-tag-' + checked_post_ids[idx]).append('<p>既読</p>')//checked_post_idsの各idのメッセージをself-post-tagに結合したもの
-        //     /*idが"self-post-tag-post.id"の部分が実行されるようになる。is_checkedはTrueになっているので下記のif文が実行される*/
-        // }
+        //console.log('test 2')
     });
 };
 function load_old_posts(){
@@ -27,9 +21,9 @@ function load_old_posts(){
         book_id: book_id,
         offset_value: offset_value //関数呼び出し
     }, function(data){
-        console.log('test3')
+        //console.log('test3')
         if(data['data']){
-            console.log('test4')
+            //console.log('test4')
             hidden_id = "load_post_" + offset_value
             hidden_tag = '<div id="' + hidden_id + '"></div>'//hiddentagを作成
             $(hidden_tag).insertAfter('#load_post_button'); //hiddentagが入ってその後にデータが読み込まれる。データの下(load_post_buttonの下)にhidden_tagが移動する
