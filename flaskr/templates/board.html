@@ -4,33 +4,38 @@
 掲示板 - {{ super() }}
 {% endblock %}
 {% block content %}
+<script src="{{url_for('static', filename='scripts/posts.js')}}"></script>
 <div class="row">
+    <div id="load_post_button" class="col-12">
+        <button class="col-12 btn btn-light btn-outline-primary" onclick="load_old_posts();">100件読み込む</button>
+    </div>
     {% for post in posts|reverse %}
-        {% if post.from_user_id == current_user.id %} {#メッセージの送信主がログインユーザの場合右側にmessageを表示する#}
+        {% if post.from_user_id == current_user.id %}
+        <div class="col-lg-1 offset-lg-6 col-md-1 offset-md-2 col-sm-1 offset-sm-1 col-1"></div>
         <div class="speech-bubble-self col-lg-4 col-md-8 col-sm-8 col-9">
-            {% for splitted_message in post.post|replace_newline %} {#\nの改行コードが区切られた形でこのメッセージを変換してループ文で回す#}
-            <p>{{splitted_message|urlize}}</p>
+            {% for splitted_post in post.post|replace_newline %}
+            <p>{{splitted_post|urlize}}</p>
             {% endfor %}
         </div>
         <div class="col-lg-1 col-md-1 col-sm-2 col-2"> {#ピクチャの表示に2だけ使用する#}
-            <p>{{current_user.username}}</p>{#画像の下に名前#}
+            <p>{{current_user.username}}</p>
         </div>
-        {% else %} {#相手からのメッセージの場合左側#}
+        {% else %}
         <div class="col-lg-1 col-md-1 col-sm-2 col-2">
-            <p>{{post.user.username}}</p>{#画像の下に名前#}
+            <p>{{post.user.username}}</p>
         </div>
-        <div class="speech-bubble-dest col-lg-4 col-md-8 col-sm-8 col-9"> {#中くらいは画面は8の大きさ、小さい画面は8の大きさ、一番小さい画面は9#}
-            {% for splitted_message in post.post|replace_newline %} {#\nの改行コードが区切られた形でこのメッセージを変換してループ文で回す#}
-            <p>{{splitted_message|urlize}}</p>
+        <div class="speech-bubble-dest col-lg-4 col-md-8 col-sm-8 col-9">
+            {% for splitted_post in post.post|replace_newline %}
+            <p>{{splitted_post|urlize}}</p>
             {% endfor %}
         </div>
-        <div class="col-lg-7 col-md-3 col-sm-1 col-1"></div>{#あまりをdivで埋める#}
+        <div class="col-lg-7 col-md-3 col-sm-1 col-1"></div>
         {% endif %}
     {% endfor %}
-    <div id="message-form" class="col-lg-4 offset-lg-7 col-md-8 offset-md-4 col-sm-12 col-12">{#messageを送信するフォーム#}
+    <div id="post-form" class="col-lg-4 offset-lg-7 col-md-8 offset-md-4 col-sm-12 col-12">{#postを送信するフォーム#}
         <form method="POST">
             {{ form.csrf_token }}
-            {{ render_field(form.post, cols="50", rows="5")}} {#横に50文字縦に5文字#}
+            {{ render_field(form.post, cols="50", rows="5")}}
             {{ form.submit() }}
         </form>
     </div>

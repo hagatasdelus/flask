@@ -1,6 +1,6 @@
 from flask import (
     request, render_template, redirect, url_for, Blueprint,
-    session, flash, abort
+    session, flash, abort, jsonify
 )
 from flask_login import login_user, login_required, logout_user, current_user
 from flaskr.forms import (
@@ -10,6 +10,7 @@ from flaskr.forms import (
 from flaskr.models import (
     BookInfo, User, transaction, PasswordResetToken, Board
 )
+from flaskr.utils.post_formats import make_post_format, make_old_post_format
 from flaskr import db
 from datetime import datetime
 import os
@@ -220,16 +221,71 @@ def board(id):
     form = BoardForm(request.form)
     book = BookInfo.select_book_by_id(id)
     posts = Board.get_book_posts(id)
-    if request.method == 'POST' and form.validate():
-        new_post = Board(
-            current_user.get_id(),
-            id,
-            form.post.data
-        )
-        with transaction():
-            new_post.create_post()
-        return redirect(url_for('app.board', id=id))
-    return render_template('board.html', form=form, posts=posts, book=book)
+    from setup import app
+    with app.app_context():
+        # read_post_ids = [post.id for post in posts if (not post.is_read) and (post.from_user_id == int(current_user.get_id()))]
+        read_post_ids = [post.id for post in posts if (not post.is_read) and (post.from_user_id != int(current_user.get_id()))]
+        print('\033[32m'+f'✔︎ Test 9 passed {read_post_ids}'+'\033[0m')
+        if read_post_ids:
+            with transaction():
+                Board.update_is_read_by_ids(read_post_ids)
+        if request.method == 'POST' and form.validate():
+            new_post = Board(
+                current_user.get_id(),
+                id,
+                form.post.data
+            )   
+            with transaction():
+                new_post.create_post()
+            return redirect(url_for('app.board', id=id))
+    return render_template('board.html', form=form, posts=posts, book=book, book_id=id)
+
+@bp.route('/post_ajax', methods=['GET'])
+@login_required
+def post_ajax():
+    book_id = request.args.get('book.id', -1, type=int) #ajaxで飛んできたリクエストの相手のidを取得. 存在しない場合は-1を指定してtypeをintとする
+    not_read_posts = Board.select_not_read_posts(book_id)
+
+    print('\033[32m'+f'✔︎ Test 6 passed {not_read_posts}, {book_id}'+'\033[0m')
+    #まだ読んでいない相手からのメッセージを取得する処理
+    #book_idがjsから飛んでいかない
+    # user = User.select_user_by_id(book_id) #ユーザ情報を取得
+    # not_read_posts = Board.select_not_read_posts(book_id, current_user.get_id()) #相手からログインしている自分に対するまだ読んでいないメッセージを取得する
+    # not_read_posts_ids = [post.id for post in not_read_posts] #まだ読んでいないメッセージのidをリストで取得
+    # from setup import app
+    # with app.app_context():
+    #     if not_read_posts_ids:        
+    #         with transaction():
+    #             Message.update_is_read_by_ids(not_read_posts_ids) #読まれたメッセージのidたちを元にDBのis_readをTrueにupdateする
+    #     #既に相手に読まれた自分のメッセージでまだチェックしていないものを取得
+    #     not_checked_posts = Message.select_not_checked_posts(current_user.get_id(), user_id)
+    #     not_checked_post_ids = [not_checked_post.id for not_checked_post in not_checked_posts] #not_checked_postsのidを取得する
+    #     if not_checked_post_ids:
+    #         with transaction():
+    #             Message.update_is_checked_by_ids(not_checked_post_ids)
+    return jsonify(data=make_post_format(not_read_posts)) #dataとしてtemplateに返す.このidを見て代用する部分を既読にします
+
+@bp.route('/load_old_posts', methods=['GET'])
+@login_required
+def load_old_posts():
+    book_id = request.args.get('book_id', -1, type=int)
+    offset_value = request.args.get('offset_value', -1, type=int)
+    print('\033[32m'+'✔︎ Test 7 passed'+'\033[0m')
+    # if book_id == -1 or offset_value == -1:
+    #     print('\033[32m'+'✔︎ Test 8 passed'+'\033[0m')
+    #     return #何もせずに返す
+    flag = 0
+    if book_id == -1:
+        print('\033[32m'+'book_id == -1'+'\033[0m')
+        flag = 1
+    if offset_value == -1:
+        print('\033[32m'+'offset_value == -1'+'\033[0m')
+        flag = 1
+    if flag == 1:
+        return
+    posts = Board.get_book_posts(book_id, offset_value * 100) #100件飛ばした後のデータのメッセージを取り出す
+    print('\033[32m'+'✔︎ Test 5 passed'+'\033[0m')
+    return jsonify(data=make_old_post_format(posts)) #meke_post_formatはメッセージを送った際にAjaxでメッセージを取り出しそれを画面に表示するための関数
 
 @bp.app_errorhandler(404) #ページが間違うとmain
 def redirect_main_page(e):
