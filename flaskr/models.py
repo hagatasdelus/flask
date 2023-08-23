@@ -157,7 +157,8 @@ class Board(db.Model):
     book_id = db.Column(db.Integer, db.ForeignKey('book_infos.id'), index=True)
     from_user_id = db.Column(db.Integer, db.ForeignKey('users.id'), index=True)
     post = db.Column(db.Text)
-    is_read = db.Column(db.Boolean, default=False)
+    read = db.Column(db.Boolean, default=False)
+    checked = db.Column(db.Boolean, default=False)
     create_at = db.Column(db.DateTime, default=datetime.now)
     update_at = db.Column(db.DateTime, default=datetime.now)
 
@@ -190,6 +191,13 @@ class Board(db.Model):
         cls.query.filter(cls.id.in_(ids)).update(
             {'is_read': True},
             synchronize_session='fetch'
+        )
+
+    @classmethod
+    def update_is_checked_by_ids(cls, ids):
+        cls.query.filter(cls.id.in_(ids)).update(
+            {'is_checked': 1}, #0の場合はfalseになる
+            synchronize_session='fetch' #これがないとエラーになる
         )
 
     @classmethod

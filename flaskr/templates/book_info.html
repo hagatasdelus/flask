@@ -16,7 +16,7 @@
         {% endif %}
     </div>
     <div class="col-lg-4 offset-lg-2">
-        <form method="POST" enctype="multipart/form-data">
+        <form method="POST" enctype="multipart/form-data" autocomplete="off">
             {{form.csrf_token}}
             {{render_field(form.title, value=book.title)}}
             {{render_field(form.genre, value=book.genre)}}
