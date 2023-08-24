@@ -44,6 +44,9 @@ def book_info(id):
             flash('You do not have permission to update.')
             return redirect(url_for('app.book_detail', id=id))
         if request.method == 'POST' and form.validate():
+            if BookInfo.select_book_by_title(form.title.data):
+                flash('The book with that title is already registered.')
+                return redirect(url_for('app.newtitle'))
             with transaction():
                 book.title = form.title.data
                 book.price = form.price.data
@@ -176,6 +179,9 @@ def change_password():
 def register_books():
     form = RegisterBookForm(request.form)
     if request.method == 'POST' and form.validate():
+        if BookInfo.select_book_by_title(form.title.data):
+            flash('The book with that title is already registered.')
+            return redirect(url_for('app.newtitle'))
         book = BookInfo(
             title = form.title.data,
             price = form.price.data,
@@ -219,6 +225,9 @@ def confirm_delete(id):
 def board(id):
     form = BoardForm(request.form)
     book = BookInfo.select_book_by_id(id)
+    if not book:
+        flash('The book is not currently registered.')
+        return redirect(url_for('app.newtitle'))
     posts = Board.get_book_posts(id)
     from setup import app
     with app.app_context():
@@ -227,6 +236,8 @@ def board(id):
             with transaction():
                 Board.update_read_by_ids(read_post_ids)
         if request.method == 'POST' and form.validate():
+            if form.post.data == '':
+                return redirect(url_for('app.board', id=id))
             new_post = Board(current_user.get_id(), id, form.post.data)
             with transaction():
                 new_post.create_post()

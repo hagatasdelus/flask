@@ -17,7 +17,7 @@
 	position: relative;
 	background: #96a5a6;
 	border-radius: .4em;
-    margin-bottom: 20px; /*メッセージとメッセージの間に空間を空ける*/
+    margin-bottom: 20px;
 }
 
 .speech-bubble-dest:after {
@@ -38,7 +38,7 @@
 	position: relative;
 	background: #21c8d4;
 	border-radius: .4em;
-    margin-bottom: 20px; /*メッセージとメッセージの間に空間を空ける*/
+    margin-bottom: 20px;
 }
 
 .speech-bubble-self:after {
@@ -53,4 +53,11 @@
 	border-right: 0;
 	margin-top: -12px;
 	margin-right: -12px;
+}
+
+.navbar {
+	position: fixed;
+	top: 0;
+	width: 100%;
+	z-index: 10000;
 }

@@ -46,7 +46,7 @@ class BookInfo(db.Model):
     def get_books(cls):
         return cls.query.order_by(
             cls.arrival_day.desc()
-        ).limit(10).all()
+        ).all()
     
     @classmethod
     def select_book_by_id(cls, id):
@@ -55,6 +55,10 @@ class BookInfo(db.Model):
     @classmethod
     def delete_book(cls, id):    
         cls.query.filter_by(id=int(id)).delete()
+
+    @classmethod
+    def select_book_by_title(cls, title):
+        return cls.query.filter_by(title=title).first()
       
 class User(UserMixin, db.Model):
 

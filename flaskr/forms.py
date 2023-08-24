@@ -37,7 +37,6 @@ class PasswordResetForm(FlaskForm):
         if len(field.data) < 8:
             raise ValidationError('Password must be at least 8 characters.')
 
-
 class ForgotPasswordForm(FlaskForm):
     email = StringField('メール: ', validators=[DataRequired(), Email()])
     submit = SubmitField('パスワードを再設定')
