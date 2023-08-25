@@ -41,24 +41,12 @@ class BookInfo(db.Model):
 
     def create_new_book(self):
         db.session.add(self)
-    
-    # @classmethod
-    # def select_book_by_title(cls, title, page=1):
-    #     return cls.query.filter(
-    #         cls.title.like(f'%{title}%')
-    #     ).order_by(cls.title).paginate(page=page, per_page=50, error_out=False)
-    
-    # @classmethod
-    # def select_book_by_genre(cls, genre, page=1):
-    #     return cls.query.filter(
-    #         cls.genre.like(f'%{genre}%')
-    #     ).order_by(cls.genre).paginate(page=page, per_page=50, error_out=False)
 
     @classmethod
     def get_books(cls):
         return cls.query.order_by(
             cls.arrival_day.desc()
-        ).limit(10).all()
+        ).all()
     
     @classmethod
     def select_book_by_id(cls, id):
@@ -67,6 +55,10 @@ class BookInfo(db.Model):
     @classmethod
     def delete_book(cls, id):    
         cls.query.filter_by(id=int(id)).delete()
+
+    @classmethod
+    def select_book_by_title(cls, title):
+        return cls.query.filter_by(title=title).first()
       
 class User(UserMixin, db.Model):
 
@@ -157,7 +149,7 @@ class Board(db.Model):
     book_id = db.Column(db.Integer, db.ForeignKey('book_infos.id'), index=True)
     from_user_id = db.Column(db.Integer, db.ForeignKey('users.id'), index=True)
     post = db.Column(db.Text)
-    is_read = db.Column(db.Boolean, default=False)
+    read = db.Column(db.Boolean, default=False)
     create_at = db.Column(db.DateTime, default=datetime.now)
     update_at = db.Column(db.DateTime, default=datetime.now)
 
@@ -186,9 +178,9 @@ class Board(db.Model):
             ).delete()
     
     @classmethod
-    def update_is_read_by_ids(cls, ids):
+    def update_read_by_ids(cls, ids):
         cls.query.filter(cls.id.in_(ids)).update(
-            {'is_read': True},
+            {'read': True},
             synchronize_session='fetch'
         )
 
@@ -196,7 +188,8 @@ class Board(db.Model):
     def select_not_read_posts(cls, book_id):
         return cls.query.filter(
             and_(
+                cls.from_user_id != int(current_user.get_id()),
                 cls.book_id == book_id,
-                cls.is_read == 0
+                cls.read == 0
             )
         ).order_by(cls.id).all()

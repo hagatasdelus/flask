@@ -8,7 +8,7 @@
 {{ message }}
 {% endfor %}
 <div class="row">
-    <form method="POST"> {# 以下で入力されたものはPOSTでlogin関数に戻す。最初はformには何も入らない #}
+    <form method="POST" autocomplete="off"> {# 以下で入力されたものはPOSTでlogin関数に戻す。最初はformには何も入らない #}
         {{ form.csrf_token }}
         {{ render_field(form.email) }}
         {{ render_field(form.password) }}

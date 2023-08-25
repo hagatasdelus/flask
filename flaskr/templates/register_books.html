@@ -6,7 +6,7 @@
 {% block content %}
 <h1>図書情報登録画面</h1>
 <div class="row">
-    <form method="POST">
+    <form method="POST" autocomplete="off">
         {{ form.csrf_token }}
         {{ render_field(form.title) }}
         {{ render_field(form.genre) }}

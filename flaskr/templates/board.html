@@ -4,6 +4,9 @@
 掲示板 - {{ super() }}
 {% endblock %}
 {% block content %}
+<script>
+    var book_id = "{{ book.id }}";
+</script>
 <script src="{{url_for('static', filename='scripts/posts.js')}}"></script>
 <div class="row">
     <div id="load_post_button" class="col-12">
@@ -17,7 +20,7 @@
             <p>{{splitted_post|urlize}}</p>
             {% endfor %}
         </div>
-        <div class="col-lg-1 col-md-1 col-sm-2 col-2"> {#ピクチャの表示に2だけ使用する#}
+        <div class="col-lg-1 col-md-1 col-sm-2 col-2">
             <p>{{current_user.username}}</p>
         </div>
         {% else %}
@@ -32,7 +35,7 @@
         <div class="col-lg-7 col-md-3 col-sm-1 col-1"></div>
         {% endif %}
     {% endfor %}
-    <div id="post-form" class="col-lg-4 offset-lg-7 col-md-8 offset-md-4 col-sm-12 col-12">{#postを送信するフォーム#}
+    <div id="post-form" class="col-lg-4 offset-lg-7 col-md-8 offset-md-4 col-sm-12 col-12">
         <form method="POST">
             {{ form.csrf_token }}
             {{ render_field(form.post, cols="50", rows="5")}}
@@ -40,5 +43,4 @@
         </form>
     </div>
 </div>
-
 {% endblock %}
